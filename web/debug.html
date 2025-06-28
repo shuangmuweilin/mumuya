@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>调试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        .debug-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h1>象棋游戏调试页面</h1>
+        
+        <div>
+            <button onclick="testBasicLoad()">测试基本加载</button>
+            <button onclick="testGameCreation()">测试游戏创建</button>
+            <button onclick="testBoardCreation()">测试棋盘创建</button>
+            <button onclick="clearLogs()">清除日志</button>
+        </div>
+        
+        <div id="console-log" class="log"></div>
+        
+        <div id="test-board" style="margin-top: 20px;">
+            <h3>测试棋盘区域</h3>
+            <div id="chessboard" style="width: 540px; height: 600px; background: #f5deb3; border: 3px solid #8b4513; position: relative; margin: 20px auto;">
+                <!-- 测试棋盘 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 重写console.log来显示在页面上
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function addLog(message, type = 'log') {
+            const logElement = document.getElementById('console-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logLine = `[${timestamp}] ${message}\n`;
+            
+            logElement.textContent += logLine;
+            logElement.className = `log ${type === 'error' ? 'error' : type === 'success' ? 'success' : ''}`;
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            // 也输出到原始console
+            if (type === 'error') {
+                originalError(message);
+            } else {
+                originalLog(message);
+            }
+        }
+        
+        console.log = (message) => addLog(message, 'log');
+        console.error = (message) => addLog(message, 'error');
+        console.warn = (message) => addLog(message, 'warn');
+        
+        function clearLogs() {
+            document.getElementById('console-log').textContent = '';
+        }
+        
+        function testBasicLoad() {
+            addLog('开始基本加载测试...', 'log');
+            
+            try {
+                addLog('✓ JavaScript执行正常', 'success');
+                addLog('✓ DOM已加载', 'success');
+                addLog('✓ 基本函数可用', 'success');
+                
+                // 测试DOM元素
+                const chessboard = document.getElementById('chessboard');
+                if (chessboard) {
+                    addLog('✓ 棋盘元素找到', 'success');
+                } else {
+                    addLog('✗ 棋盘元素未找到', 'error');
+                }
+                
+            } catch (error) {
+                addLog('✗ 基本加载测试失败: ' + error.message, 'error');
+            }
+        }
+        
+        function testGameCreation() {
+            addLog('开始游戏创建测试...', 'log');
+            
+            try {
+                // 检查ChineseChess类是否存在
+                if (typeof ChineseChess === 'undefined') {
+                    addLog('✗ ChineseChess类未定义', 'error');
+                    return;
+                }
+                
+                addLog('✓ ChineseChess类已定义', 'success');
+                
+                // 尝试创建实例
+                const game = new ChineseChess();
+                addLog('✓ 游戏实例创建成功', 'success');
+                
+                // 检查基本属性
+                if (game.board) {
+                    addLog('✓ 棋盘数据已初始化', 'success');
+                } else {
+                    addLog('✗ 棋盘数据未初始化', 'error');
+                }
+                
+                if (game.currentPlayer) {
+                    addLog(`✓ 当前玩家: ${game.currentPlayer}`, 'success');
+                } else {
+                    addLog('✗ 当前玩家未设置', 'error');
+                }
+                
+            } catch (error) {
+                addLog('✗ 游戏创建失败: ' + error.message, 'error');
+                addLog('错误堆栈: ' + error.stack, 'error');
+            }
+        }
+        
+        function testBoardCreation() {
+            addLog('开始棋盘创建测试...', 'log');
+            
+            try {
+                const chessboard = document.getElementById('chessboard');
+                chessboard.innerHTML = '';
+                
+                // 创建简单的测试棋盘
+                for (let row = 0; row < 3; row++) {
+                    for (let col = 0; col < 3; col++) {
+                        const cell = document.createElement('div');
+                        cell.style.position = 'absolute';
+                        cell.style.width = '60px';
+                        cell.style.height = '60px';
+                        cell.style.border = '1px solid #8b4513';
+                        cell.style.left = `${col * 60}px`;
+                        cell.style.top = `${row * 60}px`;
+                        cell.style.display = 'flex';
+                        cell.style.justifyContent = 'center';
+                        cell.style.alignItems = 'center';
+                        cell.textContent = `${row},${col}`;
+                        chessboard.appendChild(cell);
+                    }
+                }
+                
+                addLog('✓ 测试棋盘创建成功', 'success');
+                
+            } catch (error) {
+                addLog('✗ 棋盘创建失败: ' + error.message, 'error');
+            }
+        }
+        
+        // 页面加载完成后自动运行基本测试
+        document.addEventListener('DOMContentLoaded', () => {
+            addLog('页面加载完成，开始自动测试...', 'log');
+            testBasicLoad();
+        });
+    </script>
+    
+    <!-- 尝试加载象棋游戏脚本 -->
+    <script>
+        // 动态加载script.js并处理错误
+        const script = document.createElement('script');
+        script.src = 'script.js';
+        script.onload = () => {
+            addLog('✓ script.js加载成功', 'success');
+            setTimeout(testGameCreation, 100);
+        };
+        script.onerror = (error) => {
+            addLog('✗ script.js加载失败', 'error');
+            addLog('错误详情: ' + error.message, 'error');
+        };
+        document.head.appendChild(script);
+    </script>
+</body>
+</html>

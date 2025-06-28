@@ -1,0 +1,45 @@
+📋 GitHub Pages 上传文件清单
+
+🎯 必须上传的核心文件（9个）：
+
+✅ index.html                 - 主页面文件
+✅ style.css                  - 样式文件  
+✅ script.js                  - 主要游戏逻辑
+✅ deep-learning-ai.js        - 深度学习AI
+✅ advanced-ai.js             - 高级AI算法
+✅ pretrained-data.js         - 预训练数据
+✅ 背景图片.png               - 背景图片
+✅ README.md                  - 项目说明文档
+✅ deploy-to-github.md        - 部署指南
+
+📝 可选文件（用于说明和帮助）：
+
+⭐ github-deploy-checklist.md - 部署检查清单
+⭐ 部署指南.md                - 中文部署指南
+
+❌ 不需要上传的文件：
+
+❌ board-test.html           - 测试文件
+❌ create-background.html    - 测试文件
+❌ debug.html                - 调试文件
+❌ final-test.html           - 测试文件
+❌ simple.html               - 简化版本
+❌ test-server.html          - 测试文件
+❌ test.html                 - 测试文件
+❌ 上传文件清单.txt          - 这个清单文件本身
+
+🎯 上传步骤：
+
+1. 选择上面标记为 ✅ 的9个核心文件
+2. 可以选择性添加 ⭐ 标记的说明文件
+3. 不要上传 ❌ 标记的测试文件
+4. 拖拽到GitHub仓库进行上传
+
+🌐 部署后的访问地址：
+https://你的GitHub用户名.github.io/mumu-chess
+
+🎮 部署完成后记得测试：
+- 游戏是否正常运行
+- AI是否能够对弈
+- 移动端是否正常显示
+- 训练功能是否可用
