@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>木木象棋 - 智能AI象棋游戏</title>
+    <meta name="description" content="木木象棋 - 具备深度学习AI的在线中国象棋游戏，支持人机对战和AI训练">
+    <meta name="keywords" content="象棋,中国象棋,AI象棋,在线象棋,深度学习">
+    <meta name="author" content="木木象棋">
+    <meta property="og:title" content="木木象棋 - 智能AI象棋游戏">
+    <meta property="og:description" content="体验最智能的AI象棋对战，支持深度学习训练">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♟️</text></svg>">
+    <link rel="stylesheet" href="style.css">
+    <!-- TensorFlow.js for Deep Learning -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+
+</head>
+<body>
+    <div class="game-container">
+        <div class="loading" id="loading">正在加载木木象棋...</div>
+        <div class="game-header">
+            <h1>🌳 木木象棋 ⚔️</h1>
+            <div class="game-info">
+                <div class="current-player">
+                    当前玩家: <span id="current-player">红方</span>
+                </div>
+                <div class="game-status">
+                    状态: <span id="game-status">游戏进行中</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 左侧面板 - 控制按钮 -->
+        <div class="left-panel">
+            <button id="restart-btn" class="side-control-btn">
+                <span class="btn-icon">🆕</span>
+                <span class="btn-text">重新开始</span>
+            </button>
+            <button id="undo-btn" class="side-control-btn">
+                <span class="btn-icon">↩️</span>
+                <span class="btn-text">悔棋</span>
+            </button>
+            <button id="hint-btn" class="side-control-btn">
+                <span class="btn-icon">💡</span>
+                <span class="btn-text">提示</span>
+            </button>
+        </div>
+
+        <!-- 中间 - 棋盘区域 -->
+        <div class="game-board-container">
+            <div class="board" id="chessboard">
+                <!-- 棋盘将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <!-- 右侧面板 - 游戏设置 -->
+        <div class="right-panel">
+            <div class="game-settings">
+                <h3>⚙️ 游戏设置</h3>
+                <div class="control-group">
+                    <label for="ai-mode">🎮 游戏模式:</label>
+                    <select id="ai-mode" class="control-select">
+                        <option value="human">人人对战</option>
+                        <option value="ai" selected>人机对战</option>
+                        <option value="ai-vs-ai">AI对战</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="ai-difficulty">🤖 AI难度:</label>
+                    <select id="ai-difficulty" class="control-select">
+                        <option value="easy">简单</option>
+                        <option value="medium" selected>中等</option>
+                        <option value="hard">困难</option>
+                        <option value="expert">专家</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 深度学习控制 -->
+            <div class="deep-learning-controls">
+                <h3>🧠 深度学习</h3>
+                <div class="control-group">
+                    <button id="toggle-deep-learning" class="control-btn-small">启用深度学习</button>
+                </div>
+                <div class="control-group">
+                    <button id="toggle-learning" class="control-btn-small">启用学习</button>
+                </div>
+                <div class="control-group">
+                    <button id="reset-learning" class="control-btn-small">重置学习数据</button>
+                </div>
+            </div>
+
+            <!-- AI对战训练控制 -->
+            <div class="training-controls">
+                <h3>🤖 AI训练</h3>
+                <div class="control-group">
+                    <button id="start-training" class="control-btn-small">开始训练</button>
+                </div>
+                <div class="control-group">
+                    <button id="stop-training" class="control-btn-small">停止训练</button>
+                </div>
+                <div class="control-group">
+                    <button id="start-ai-battle" class="control-btn-small">手动启动AI对战</button>
+                </div>
+                <div class="control-group">
+                    <button id="test-ai-strength" class="control-btn-small">测试AI能力</button>
+                </div>
+                <div class="control-group">
+                    <button id="save-training" class="control-btn-small">保存训练数据</button>
+                </div>
+                <div class="control-group">
+                    <button id="clear-training" class="control-btn-small">清除训练数据</button>
+                </div>
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="use-advanced-ai" checked> 使用高级AI
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="use-deep-learning" checked> 使用深度学习
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label for="training-speed">训练速度:</label>
+                    <select id="training-speed" class="control-select">
+                        <option value="fast" selected>极速(50ms)</option>
+                        <option value="normal">快速(200ms)</option>
+                        <option value="slow">正常(500ms)</option>
+                    </select>
+                </div>
+                <div class="training-stats">
+                    <div>训练局数: <span id="training-games">0</span></div>
+                    <div>学习经验: <span id="training-experiences">0</span></div>
+                    <div>模型参数: <span id="model-params">0</span></div>
+                    <div>学习状态: <span id="learning-status">待机</span></div>
+                    <div>训练进度: <span id="training-progress">新模型</span></div>
+                </div>
+                <div class="game-stats">
+                    <div>当前移动数: <span id="current-moves">0</span></div>
+                    <div>无吃子移动: <span id="no-capture-moves">0</span></div>
+                </div>
+            </div>
+
+            <div class="game-history">
+                <h3>📜 走棋记录</h3>
+                <div id="move-history" class="move-list">
+                    <!-- 走棋历史将在这里显示 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 错误处理和调试
+        window.addEventListener('error', (event) => {
+            console.error('页面错误:', event.error);
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.textContent = '游戏加载失败: ' + event.error.message;
+                loading.style.color = '#ff6b6b';
+            }
+        });
+
+        // 检查脚本加载
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM加载完成');
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.textContent = '正在初始化游戏...';
+            }
+        });
+
+        // 游戏加载成功后隐藏loading
+        function hideLoading() {
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.style.display = 'none';
+            }
+        }
+    </script>
+    <script src="deep-learning-ai.js"></script>
+    <script src="advanced-ai.js"></script>
+    <script src="pretrained-data.js"></script>
+    <script src="script.js" onload="console.log('script.js加载成功')" onerror="console.error('script.js加载失败')"></script>
+</body>
+</html>

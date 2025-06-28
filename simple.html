@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简化象棋游戏</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .game-header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .board {
+            width: 540px;
+            height: 600px;
+            background: #f5deb3;
+            border: 3px solid #8b4513;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            margin: 0 auto 30px;
+        }
+        
+        .cell {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 1px solid #8b4513;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .piece {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .piece.red {
+            background: radial-gradient(circle, #ff6b6b, #d32f2f);
+            color: white;
+            border: 2px solid #b71c1c;
+        }
+        
+        .piece.black {
+            background: radial-gradient(circle, #4a4a4a, #212121);
+            color: white;
+            border: 2px solid #000;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 5px;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>象棋游戏</h1>
+            <div class="game-info">
+                <div>当前玩家: <span id="current-player">红方</span></div>
+                <div>状态: <span id="game-status">游戏进行中</span></div>
+            </div>
+        </div>
+        
+        <div class="board" id="chessboard">
+            <!-- 棋盘将通过JavaScript动态生成 -->
+        </div>
+        
+        <div class="controls">
+            <button onclick="initGame()">初始化游戏</button>
+            <button onclick="testBoard()">测试棋盘</button>
+            <button onclick="clearBoard()">清空棋盘</button>
+        </div>
+        
+        <div id="status" class="status">
+            页面已加载，等待初始化...
+        </div>
+    </div>
+
+    <script>
+        let gameBoard = null;
+        
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+            console.log(message);
+        }
+        
+        function clearBoard() {
+            const boardElement = document.getElementById('chessboard');
+            boardElement.innerHTML = '';
+            updateStatus('棋盘已清空');
+        }
+        
+        function testBoard() {
+            updateStatus('开始测试棋盘创建...');
+            
+            try {
+                const boardElement = document.getElementById('chessboard');
+                boardElement.innerHTML = '';
+                
+                // 创建简单的棋盘格子
+                for (let row = 0; row < 10; row++) {
+                    for (let col = 0; col < 9; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.style.left = `${col * 60}px`;
+                        cell.style.top = `${row * 60}px`;
+                        cell.dataset.row = row;
+                        cell.dataset.col = col;
+                        
+                        // 在某些位置添加测试棋子
+                        if ((row === 0 || row === 9) && (col === 0 || col === 8)) {
+                            const piece = document.createElement('div');
+                            piece.className = `piece ${row === 0 ? 'black' : 'red'}`;
+                            piece.textContent = '车';
+                            cell.appendChild(piece);
+                        }
+                        
+                        boardElement.appendChild(cell);
+                    }
+                }
+                
+                updateStatus('✓ 测试棋盘创建成功！显示了90个格子和4个测试棋子');
+                
+            } catch (error) {
+                updateStatus('✗ 测试棋盘创建失败: ' + error.message);
+            }
+        }
+        
+        function initGame() {
+            updateStatus('开始初始化完整游戏...');
+            
+            try {
+                // 检查是否有ChineseChess类
+                if (typeof ChineseChess !== 'undefined') {
+                    gameBoard = new ChineseChess();
+                    updateStatus('✓ 完整游戏初始化成功！');
+                } else {
+                    updateStatus('ChineseChess类未找到，使用简化版本...');
+                    testBoard();
+                }
+                
+            } catch (error) {
+                updateStatus('✗ 游戏初始化失败: ' + error.message);
+                console.error('详细错误:', error);
+            }
+        }
+        
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStatus('页面DOM加载完成');
+            
+            // 延迟一点时间再尝试加载游戏
+            setTimeout(() => {
+                updateStatus('尝试自动初始化...');
+                testBoard();
+            }, 500);
+        });
+        
+        // 错误处理
+        window.addEventListener('error', (event) => {
+            updateStatus('✗ 页面错误: ' + event.error.message);
+            console.error('页面错误详情:', event.error);
+        });
+    </script>
+    
+    <!-- 尝试加载完整的游戏脚本 -->
+    <script src="script.js" onerror="updateStatus('script.js加载失败')"></script>
+</body>
+</html>

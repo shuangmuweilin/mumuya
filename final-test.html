@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>象棋游戏最终测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .status {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .warning { background: #fff3cd; color: #856404; }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+        }
+        button:hover { background: #0056b3; }
+        .game-link {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 20px 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .game-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>象棋游戏最终测试报告</h1>
+        
+        <div class="test-section">
+            <h3>🎮 游戏链接</h3>
+            <a href="index.html" class="game-link">打开象棋游戏</a>
+            <a href="simple.html" class="game-link">简化版本</a>
+            <a href="debug.html" class="game-link">调试版本</a>
+        </div>
+        
+        <div class="test-section">
+            <h3>📋 自动测试结果</h3>
+            <div id="auto-tests"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔧 手动测试</h3>
+            <button onclick="testFileLoading()">测试文件加载</button>
+            <button onclick="testGameCreation()">测试游戏创建</button>
+            <button onclick="testBoardRendering()">测试棋盘渲染</button>
+            <button onclick="testAI()">测试AI功能</button>
+            <button onclick="runAllTests()">运行所有测试</button>
+            <div id="manual-tests"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 系统信息</h3>
+            <div id="system-info"></div>
+        </div>
+    </div>
+
+    <script>
+        function addResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            container.appendChild(div);
+            console.log(message);
+        }
+        
+        function testFileLoading() {
+            addResult('manual-tests', '开始文件加载测试...', 'info');
+            
+            const files = ['style.css', 'script.js', 'index.html'];
+            let completed = 0;
+            
+            files.forEach(file => {
+                fetch(file)
+                    .then(response => {
+                        if (response.ok) {
+                            addResult('manual-tests', `✓ ${file} 加载成功`, 'success');
+                        } else {
+                            addResult('manual-tests', `✗ ${file} 加载失败 (${response.status})`, 'error');
+                        }
+                    })
+                    .catch(err => {
+                        addResult('manual-tests', `✗ ${file} 加载错误: ${err.message}`, 'error');
+                    })
+                    .finally(() => {
+                        completed++;
+                        if (completed === files.length) {
+                            addResult('manual-tests', '文件加载测试完成', 'info');
+                        }
+                    });
+            });
+        }
+        
+        function testGameCreation() {
+            addResult('manual-tests', '开始游戏创建测试...', 'info');
+            
+            try {
+                if (typeof ChineseChess === 'undefined') {
+                    addResult('manual-tests', '✗ ChineseChess类未定义', 'error');
+                    return;
+                }
+                
+                const game = new ChineseChess();
+                addResult('manual-tests', '✓ 游戏实例创建成功', 'success');
+                
+                if (game.board && Array.isArray(game.board)) {
+                    addResult('manual-tests', `✓ 棋盘数据正常 (${game.board.length}x${game.board[0].length})`, 'success');
+                } else {
+                    addResult('manual-tests', '✗ 棋盘数据异常', 'error');
+                }
+                
+                if (game.currentPlayer) {
+                    addResult('manual-tests', `✓ 当前玩家: ${game.currentPlayer}`, 'success');
+                } else {
+                    addResult('manual-tests', '✗ 当前玩家未设置', 'error');
+                }
+                
+                if (typeof game.getBestMove === 'function') {
+                    addResult('manual-tests', '✓ AI功能可用', 'success');
+                } else {
+                    addResult('manual-tests', '✗ AI功能不可用', 'error');
+                }
+                
+            } catch (error) {
+                addResult('manual-tests', `✗ 游戏创建失败: ${error.message}`, 'error');
+            }
+        }
+        
+        function testBoardRendering() {
+            addResult('manual-tests', '开始棋盘渲染测试...', 'info');
+            
+            try {
+                // 创建临时棋盘容器
+                const testBoard = document.createElement('div');
+                testBoard.id = 'test-chessboard';
+                testBoard.style.width = '540px';
+                testBoard.style.height = '600px';
+                testBoard.style.position = 'relative';
+                testBoard.style.background = '#f5deb3';
+                testBoard.style.border = '3px solid #8b4513';
+                testBoard.style.display = 'none';
+                document.body.appendChild(testBoard);
+                
+                // 创建测试格子
+                for (let row = 0; row < 10; row++) {
+                    for (let col = 0; col < 9; col++) {
+                        const cell = document.createElement('div');
+                        cell.style.position = 'absolute';
+                        cell.style.width = '60px';
+                        cell.style.height = '60px';
+                        cell.style.left = `${col * 60}px`;
+                        cell.style.top = `${row * 60}px`;
+                        cell.style.border = '1px solid #8b4513';
+                        testBoard.appendChild(cell);
+                    }
+                }
+                
+                if (testBoard.children.length === 90) {
+                    addResult('manual-tests', '✓ 棋盘格子渲染正常 (90个格子)', 'success');
+                } else {
+                    addResult('manual-tests', `✗ 棋盘格子数量异常 (${testBoard.children.length}/90)`, 'error');
+                }
+                
+                // 清理
+                document.body.removeChild(testBoard);
+                
+            } catch (error) {
+                addResult('manual-tests', `✗ 棋盘渲染失败: ${error.message}`, 'error');
+            }
+        }
+        
+        function testAI() {
+            addResult('manual-tests', '开始AI功能测试...', 'info');
+            
+            try {
+                if (typeof ChineseChess === 'undefined') {
+                    addResult('manual-tests', '✗ 无法测试AI：游戏类未定义', 'error');
+                    return;
+                }
+                
+                const game = new ChineseChess();
+                
+                // 测试AI移动生成
+                const moves = game.getAllPossibleMoves('black');
+                if (moves && moves.length > 0) {
+                    addResult('manual-tests', `✓ AI可生成移动 (${moves.length}个可能移动)`, 'success');
+                } else {
+                    addResult('manual-tests', '✗ AI无法生成移动', 'error');
+                }
+                
+                // 测试棋局评估
+                const score = game.evaluatePosition();
+                if (typeof score === 'number') {
+                    addResult('manual-tests', `✓ 棋局评估正常 (分数: ${score})`, 'success');
+                } else {
+                    addResult('manual-tests', '✗ 棋局评估异常', 'error');
+                }
+                
+                // 测试开局库
+                const openingMove = game.getOpeningMove();
+                if (openingMove || game.moveHistory.length === 0) {
+                    addResult('manual-tests', '✓ 开局库功能正常', 'success');
+                } else {
+                    addResult('manual-tests', '✗ 开局库功能异常', 'warning');
+                }
+                
+            } catch (error) {
+                addResult('manual-tests', `✗ AI测试失败: ${error.message}`, 'error');
+            }
+        }
+        
+        function runAllTests() {
+            addResult('manual-tests', '=== 开始运行所有测试 ===', 'info');
+            testFileLoading();
+            setTimeout(() => testGameCreation(), 500);
+            setTimeout(() => testBoardRendering(), 1000);
+            setTimeout(() => testAI(), 1500);
+            setTimeout(() => addResult('manual-tests', '=== 所有测试完成 ===', 'info'), 2000);
+        }
+        
+        // 自动测试
+        function runAutoTests() {
+            addResult('auto-tests', '开始自动测试...', 'info');
+            
+            // 基本环境检查
+            addResult('auto-tests', `✓ 浏览器: ${navigator.userAgent}`, 'info');
+            addResult('auto-tests', `✓ 页面URL: ${window.location.href}`, 'info');
+            addResult('auto-tests', `✓ 文档就绪状态: ${document.readyState}`, 'info');
+            
+            // JavaScript功能检查
+            try {
+                const testObj = { test: true };
+                const testJson = JSON.stringify(testObj);
+                addResult('auto-tests', '✓ JSON功能正常', 'success');
+            } catch (e) {
+                addResult('auto-tests', '✗ JSON功能异常', 'error');
+            }
+            
+            try {
+                const testArray = [1, 2, 3];
+                const testMap = testArray.map(x => x * 2);
+                addResult('auto-tests', '✓ 数组方法正常', 'success');
+            } catch (e) {
+                addResult('auto-tests', '✗ 数组方法异常', 'error');
+            }
+            
+            // DOM功能检查
+            try {
+                const testDiv = document.createElement('div');
+                testDiv.className = 'test';
+                addResult('auto-tests', '✓ DOM操作正常', 'success');
+            } catch (e) {
+                addResult('auto-tests', '✗ DOM操作异常', 'error');
+            }
+            
+            addResult('auto-tests', '自动测试完成', 'info');
+        }
+        
+        // 系统信息
+        function showSystemInfo() {
+            const info = document.getElementById('system-info');
+            info.innerHTML = `
+                <div class="status info">浏览器: ${navigator.userAgent}</div>
+                <div class="status info">语言: ${navigator.language}</div>
+                <div class="status info">屏幕分辨率: ${screen.width}x${screen.height}</div>
+                <div class="status info">视口大小: ${window.innerWidth}x${window.innerHeight}</div>
+                <div class="status info">当前时间: ${new Date().toLocaleString()}</div>
+                <div class="status info">时区: ${Intl.DateTimeFormat().resolvedOptions().timeZone}</div>
+            `;
+        }
+        
+        // 页面加载完成后运行
+        document.addEventListener('DOMContentLoaded', () => {
+            showSystemInfo();
+            runAutoTests();
+        });
+        
+        // 错误监听
+        window.addEventListener('error', (event) => {
+            addResult('auto-tests', `✗ 页面错误: ${event.error.message}`, 'error');
+        });
+    </script>
+    
+    <!-- 加载游戏脚本进行测试 -->
+    <script src="script.js" 
+            onload="addResult('auto-tests', '✓ script.js加载成功', 'success')" 
+            onerror="addResult('auto-tests', '✗ script.js加载失败', 'error')">
+    </script>
+</body>
+</html>

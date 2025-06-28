@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>木木象棋 - 服务器测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .game-link {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 20px 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .game-link:hover {
+            transform: translateY(-2px);
+        }
+        
+        .file-list {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .file-list h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        
+        .file-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .file-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .file-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .instructions {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌳 木木象棋 ⚔️</h1>
+        
+        <div class="status success">
+            ✅ 文件系统正常运行
+        </div>
+        
+        <div class="status info">
+            📁 游戏文件已准备就绪
+        </div>
+        
+        <div class="file-list">
+            <h3>📋 可用的游戏文件：</h3>
+            <ul>
+                <li>🎮 <strong>index.html</strong> - 主游戏（木木象棋）</li>
+                <li>🧪 <strong>board-test.html</strong> - 棋盘测试页面</li>
+                <li>🔧 <strong>debug.html</strong> - 调试页面</li>
+                <li>✅ <strong>final-test.html</strong> - 最终测试</li>
+                <li>🎯 <strong>simple.html</strong> - 简化版本</li>
+            </ul>
+        </div>
+        
+        <div class="instructions">
+            <h3>🚀 启动说明：</h3>
+            <p><strong>方法1：</strong> 直接双击 <code>index.html</code> 文件在浏览器中打开</p>
+            <p><strong>方法2：</strong> 使用本地服务器（推荐）：</p>
+            <ul>
+                <li>Python: <code>python -m http.server 8000</code></li>
+                <li>Node.js: <code>npx http-server -p 8000</code></li>
+                <li>PHP: <code>php -S localhost:8000</code></li>
+            </ul>
+            <p><strong>方法3：</strong> 使用VS Code Live Server扩展</p>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <a href="index.html" class="game-link">🎮 开始游戏</a>
+            <a href="board-test.html" class="game-link">🧪 测试棋盘</a>
+        </div>
+        
+        <div class="status info" style="margin-top: 20px;">
+            🎯 如果链接无法点击，请直接在浏览器地址栏输入文件名
+        </div>
+    </div>
+
+    <script>
+        // 检测当前访问方式
+        document.addEventListener('DOMContentLoaded', () => {
+            const protocol = window.location.protocol;
+            const isFileProtocol = protocol === 'file:';
+            
+            if (isFileProtocol) {
+                const warning = document.createElement('div');
+                warning.className = 'status info';
+                warning.innerHTML = `
+                    <strong>📌 当前使用文件协议访问</strong><br>
+                    某些功能可能受限，建议使用本地服务器
+                `;
+                document.querySelector('.container').appendChild(warning);
+            } else {
+                const success = document.createElement('div');
+                success.className = 'status success';
+                success.innerHTML = `
+                    <strong>🌐 服务器模式运行正常</strong><br>
+                    当前地址: ${window.location.href}
+                `;
+                document.querySelector('.container').appendChild(success);
+            }
+        });
+    </script>
+</body>
+</html>
